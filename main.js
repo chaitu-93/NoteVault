@@ -1,86 +1,77 @@
-import { renderNotes } from "./app.js"
 
-let note = document.querySelector(".note");
-let title = document.querySelector(".title");
-let addNoteButton = document.querySelector(".button");
-let notesDisplay = document.querySelector(".notes-display");
-let showOtherNotes = document.querySelector(".notes-container");
-let showPinnedNotes = document.querySelector(".pinned-notes-container");
-let arrayOfNotes = JSON.parse(localStorage.getItem("notes")) || [];
-let pinTitle = document.querySelector(".pin-title");
-let otherTitle = document.querySelector(".other-title");
+import { renderNotes } from   "./app.js"
 
-if (arrayOfNotes.length > 0){
-    pinTitle.classList.toggle("d-none");
-    otherTitle.classList.toggle("d-none");
+let note  = document.querySelector(".note")
+
+let title = document.querySelector(".title")
+
+let addNoteButton = document.querySelector(".add-btn")
+
+let notesDisplay = document.querySelector(".notes-display")
+
+let showOtherNotes = document.querySelector(".notes-container")
+
+let showPinnedNotes = document.querySelector(".pinned-notes-container")
+
+let pinTitle = document.querySelector(".pin-title")
+
+let otherTitle = document.querySelector(".other-title")
+
+let arrayOfNotes =JSON.parse(localStorage.getItem("notes")) || []
+
+
+if(arrayOfNotes.length > 0){
+    pinTitle.classList.toggle("d-none")
+    otherTitle.classList.toggle("d-none")
 }
 
 
+notesDisplay.addEventListener("click",(event)=>{
+    // console.log(event.target)
+    let type = event.target.dataset.type
+    let noteId = event.target.dataset.id
+    // console.log(type,noteId)
 
-addNoteButton.addEventListener("click", () => {
-    if (note.value.trim().length > 0 || title.value.trim().length > 0) {
-        arrayOfNotes.push({
-            id: Date.now(),
-            note: note.value.trim(),
-            title: title.value.trim(),
-            isPinned: false,
-            isArchived: false,
-        });
-        note.value = title.value = "";
-        showOtherNotes.innerHTML = renderNotes(arrayOfNotes.filter(({
-            isPinned, isArchived
-        }) => !isPinned && !isArchived));
-        localStorage.setItem("notes", JSON.stringify(arrayOfNotes));
-    }
-});
-
-notesDisplay.addEventListener("click", (event) => {
-    let noteId = event.target.dataset.id;
-    let type = event.target.dataset.type;
-    switch (type) {
+    switch(type){
         case "del":
-            arrayOfNotes = arrayOfNotes.filter(({
-                id
-            }) => id.toString() !== noteId);
-            showOtherNotes.innerHTML = renderNotes(arrayOfNotes.filter(({
-                isPinned, isArchived
-            }) => !isPinned && !isArchived));
-            showPinnedNotes.innerHTML = renderNotes(arrayOfNotes.filter(({
-                isPinned
-            }) => isPinned));
-            localStorage.setItem("notes", JSON.stringify(arrayOfNotes));
+            arrayOfNotes = arrayOfNotes.filter(({id})=>id.toString() !== noteId)
+            showOtherNotes.innerHTML  = renderNotes(arrayOfNotes.filter(({isPinned,isArchived})=>!isPinned&&!isArchived))
+            showPinnedNotes.innerHTML = renderNotes(arrayOfNotes.filter(({isPinned})=>isPinned))
+            localStorage.setItem("notes",JSON.stringify(arrayOfNotes))
             break;
+        
         case "pinned":
-            arrayOfNotes = arrayOfNotes.map(note => note.id.toString() === noteId ? {
-                ...note,
-                isPinned: !note.isPinned
-            } : note);
-            showOtherNotes.innerHTML = renderNotes(arrayOfNotes.filter(({
-                isPinned, isArchived
-            }) => !isPinned && !isArchived));
-            showPinnedNotes.innerHTML = renderNotes(arrayOfNotes.filter(({
-                isPinned
-            }) => isPinned));
-            localStorage.setItem("notes", JSON.stringify(arrayOfNotes));
-            break;
-        case "archived":
-            arrayOfNotes = arrayOfNotes.map(note => note.id.toString() === noteId ? {
-                ...note,
-                isArchived: !note.isArchived
-            } : note);
-            showOtherNotes.innerHTML = renderNotes(arrayOfNotes.filter(({
-                isPinned, isArchived
-            }) => !isPinned && !isArchived));
-            localStorage.setItem("notes", JSON.stringify(arrayOfNotes));
-            break;
-        default:
-            console.log("none");
+            arrayOfNotes= arrayOfNotes.map(note =>note.id.toString() ===noteId ?{...note, isPinned:!note.isPinned}:note)
+            showOtherNotes.innerHTML = renderNotes(arrayOfNotes.filter(({isPinned,isArchived})=>!isPinned&&!isArchived))
+            showPinnedNotes.innerHTML = renderNotes(arrayOfNotes.filter(({isPinned})=>isPinned))
+            localStorage.setItem("notes",JSON.stringify(arrayOfNotes))
+            // console.log(arrayOfNotes)
+            break
+        
+        case "archive":
+            arrayOfNotes = arrayOfNotes.map(note => note.id.toString() === noteId ?{...note,isArchived:!note.isArchived}:note)
+            showOtherNotes.innerHTML = renderNotes(arrayOfNotes.filter(({isPinned,isArchived}) => !isPinned &&!isArchived))
+            localStorage.setItem("notes",JSON.stringify(arrayOfNotes))
     }
+        
+   
 })
 
-showOtherNotes.innerHTML = renderNotes(arrayOfNotes.filter(({
-    isPinned, isArchived
-}) => !isPinned && !isArchived));
-showPinnedNotes.innerHTML = renderNotes(arrayOfNotes.filter(({
-    isPinned
-}) => isPinned));
+
+
+addNoteButton.addEventListener("click", ()=>{
+    if(note.value.trim().length > 0 || title.value.trim().length >0){
+        arrayOfNotes =  [...arrayOfNotes,{id:Date.now(),
+                                        title:title.value.trim(),
+                                        note:note.value.trim(),
+                                        isPinned : false,
+                                        isArchived : false }]
+        note.value = title.value = ""
+        showOtherNotes.innerHTML = renderNotes(arrayOfNotes.filter(({isPinned,isArchived})=>!isPinned&&!isArchived))
+        localStorage.setItem("notes",JSON.stringify(arrayOfNotes))
+    }
+    console.log(arrayOfNotes)
+})
+
+showOtherNotes.innerHTML = renderNotes(arrayOfNotes.filter(({ isPinned, isArchived }) => !isArchived && !isPinned));
+showPinnedNotes.innerHTML = renderNotes(arrayOfNotes.filter(({ isPinned,isArchived}) => isPinned && !isArchived));
